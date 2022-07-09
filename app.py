@@ -7,8 +7,8 @@ import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request
 
-MODEL_PATH = 'models/densenet_two_resize_299.model'
-LABEL_MAP_PATH = 'two_label_map.json'
+MODEL_PATH = 'models/resnet_large_resize_150_cpu.model'
+LABEL_MAP_PATH = 'label_maps/full_label_map.json'
 INPUT_SIZE = 224
 
 app = Flask(__name__)
