@@ -35,11 +35,6 @@ LABEL_MAP_PATH = 'label_maps/full_label_map.json'
 ```
 
 Note: Label maps must correspond to the model used (specified in the file name)
-|Model Type | Label Map Type|
-|:-:|:-:|
-|Full|Large|
-|Four|Four|
-|Two|Two|
 
 3. Run server
 ```sh
