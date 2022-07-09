@@ -7,12 +7,15 @@ from torchvision import models
 import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request
+from flask_cors import CORS, cross_origin
 
 MODEL_PATH = 'models/densenet_full_resize_199_cpu.model'
 LABEL_MAP_PATH = 'label_maps/full_label_map.json'
 INPUT_SIZE = 224
 
 app = Flask(__name__)
+CORS(app)
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 imagenet_class_index = json.load(open(LABEL_MAP_PATH))
 model = torch.load(MODEL_PATH)
@@ -53,6 +56,7 @@ def get_prediction(image_bytes):
 
 
 @app.route('/predict', methods=['POST'])
+@cross_origin()
 def predict():
     if request.method == 'POST':
         file = request.files['file']
