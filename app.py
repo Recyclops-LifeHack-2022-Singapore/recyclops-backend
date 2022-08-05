@@ -7,13 +7,14 @@ import torchvision.transforms as transforms
 from PIL import Image
 from flask import Flask, jsonify, request
 
+MODEL_TYPE = 0 # 0 -> Image Classification, 1 -> Object Detection
 MODEL_PATH = 'models/densenet_full_resize_199_cpu.model'
 LABEL_MAP_PATH = 'label_maps/full_label_map.json'
 INPUT_SIZE = 224
 
 app = Flask(__name__)
 
-imagenet_class_index = json.load(open(LABEL_MAP_PATH))
+label_map = json.load(open(LABEL_MAP_PATH))
 model = torch.load(MODEL_PATH)
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
@@ -38,7 +39,7 @@ def transform_image(image_bytes):
     return data_transforms['val'](image).unsqueeze(0)
 
 
-def get_prediction(image_bytes):
+def get_classifcation_prediction(image_bytes):
     tensor = transform_image(image_bytes=image_bytes)
     tensor = tensor.to(device)
     outputs = model.forward(tensor)
@@ -48,7 +49,7 @@ def get_prediction(image_bytes):
     predicted_idx = str(classes.item())
     conf = conf.item()
 
-    return conf, imagenet_class_index[predicted_idx]
+    return conf, label_map[predicted_idx]
 
 
 @app.route('/predict', methods=['POST'])
@@ -56,8 +57,15 @@ def predict():
     if request.method == 'POST':
         file = request.files['file']
         img_bytes = file.read()
-        conf, class_name = get_prediction(image_bytes=img_bytes)
-        return jsonify({'confidence': conf, 'class_name': class_name})
+
+        res = None
+        if MODEL_TYPE == 0:
+            conf, class_name = get_classifcation_prediction(image_bytes=img_bytes)
+            res = jsonify({'confidence': conf, 'class_name': class_name})
+        else:
+            return jsonify({'message': 'Unknown model type configuration'}), 500
+        
+        return res
 
 
 if __name__ == '__main__':
