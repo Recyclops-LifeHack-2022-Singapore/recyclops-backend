@@ -2,7 +2,7 @@ import argparse
 import sys
 from contextlib import contextmanager
 from sqlalchemy import create_engine
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 
 from models import Base, Item
 from seed import seeds
@@ -70,8 +70,8 @@ if __name__ == '__main__':
             seed_db(engine)
 
             with Session(bind=engine) as session:
-                values = session.query(Item).all()
-                print(values)
+                values = session.query(Item).options(joinedload(Item.category)).all()
+                print(values[0].category)
 
         else:
             print("Unknown action requested, cannot proceed")

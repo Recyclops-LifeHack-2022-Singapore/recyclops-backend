@@ -38,6 +38,7 @@ class Note(Base):
 
     # relationships
     items = relationship("Item", secondary='item_notes', back_populates='notes')
+    resource = relationship("Resource", back_populates='note')
 
     def __repr__(self):
         return "<Note(text='%s', itemId='%s')>" % (self.text, self.itemId)
@@ -47,6 +48,9 @@ class Resource(Base):
     id = Column(Integer, primary_key=True)
     title = Column(String)
     link = Column(String)
+
+    # relationships
+    note = relationship("Note", back_populates='resource')
 
     def __repr__(self):
         return "<Resource(title='%s', link='%s')>" % (self.title, self.link)
