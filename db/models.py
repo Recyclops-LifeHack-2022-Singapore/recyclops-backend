@@ -1,12 +1,22 @@
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import relationship, Session, joinedload
+
+from dataclasses import dataclass
 
 Base = declarative_base()
 
+@dataclass
 class Item(Base):
+    id: int
+    ml_id: str
+    name: str
+    isRecyclable: bool
+    categoryId: int
+
     __tablename__ = 'items'
     id = Column(Integer, primary_key=True)
+    ml_id = Column(String)
     name = Column(String)
     isRecyclable = Column(Boolean)
     categoryId = Column(Integer, ForeignKey('categories.id')) 
@@ -18,7 +28,12 @@ class Item(Base):
     def __repr__(self):
         return "<Item(name='%s', categoryId='%s', isRecyclable='%s')>" % (self.name, self.categoryId, self.isRecyclable)
 
+@dataclass
 class Category(Base):
+    id: int
+    name: str
+    color: str
+    
     __tablename__ = 'categories'
     id = Column(Integer, primary_key=True)
     name = Column(String)
@@ -30,7 +45,12 @@ class Category(Base):
     def __repr__(self):
         return "<Category(name='%s', color='%s')>" % (self.name, self.color)
 
+@dataclass
 class Note(Base):
+    id: int
+    text: str
+    resourceId: int
+
     __tablename__ = 'notes'
     id = Column(Integer, primary_key=True)
     text = Column(String)
@@ -43,7 +63,12 @@ class Note(Base):
     def __repr__(self):
         return "<Note(text='%s', itemId='%s')>" % (self.text, self.itemId)
 
+@dataclass
 class Resource(Base):
+    id: int
+    title: str
+    link: str
+
     __tablename__ = 'resources'
     id = Column(Integer, primary_key=True)
     title = Column(String)

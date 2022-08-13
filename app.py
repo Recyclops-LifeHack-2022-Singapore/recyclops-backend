@@ -5,7 +5,11 @@ import torch
 from torchvision.models.detection import fasterrcnn_resnet50_fpn_v2, FasterRCNN_ResNet50_FPN_V2_Weights
 import torchvision.transforms as transforms
 from PIL import Image
+
+from db import utils
 from flask import Flask, jsonify, request
+
+app = Flask(__name__)
 
 data_transforms = lambda input_size : {
     'train': transforms.Compose([
@@ -45,7 +49,9 @@ device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = model.to(device)
 model.eval()
 
-app = Flask(__name__)
+engine = utils.init_db_connection()
+utils.create_db(engine)
+utils.seed_db(engine)
 
 def preprocess_image(image_bytes):
     image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
@@ -100,6 +106,8 @@ def predict():
         
         return res
 
+# TODO: use a cleaner solution to separate routes
+import api
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
     app.run()

@@ -3,18 +3,19 @@ import sys
 from contextlib import contextmanager
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.pool import StaticPool
 
-from models import Base, Item
-from seed import seeds
+from db.models import Base, Item
+from db.seed import seeds
 
-@contextmanager
 def init_db_connection():
-    engine = create_engine("sqlite+pysqlite:///:memory:", echo=True, future=True)
-    try:
-        yield engine
-    finally:
-        # do nothing, session will be closed on exiting this context
-        engine.dispose()
+    engine = create_engine("sqlite+pysqlite:///:memory:", 
+        echo=True, 
+        future=True, 
+        connect_args={"check_same_thread": False}, 
+        poolclass=StaticPool
+    )
+    return engine
 
 
 def create_db(engine):
@@ -52,27 +53,29 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    with init_db_connection() as engine:
-        if args.create: # create db and loads schema
-            create_db(engine)
+    engine = init_db_connection()
+    if args.create: # create db and loads schema
+        create_db(engine)
 
-        elif args.seed: # seed / populates the db
-            seed_db(engine)
+    elif args.seed: # seed / populates the db
+        seed_db(engine)
 
-        elif args.clean: # empty tables
-            clean_db(engine)
+    elif args.clean: # empty tables
+        clean_db(engine)
 
-        elif args.drop: # drop db
-            drop_db(engine)
+    elif args.drop: # drop db
+        drop_db(engine)
 
-        elif args.test:
-            create_db(engine)
-            seed_db(engine)
+    elif args.test:
+        create_db(engine)
+        seed_db(engine)
 
-            with Session(bind=engine) as session:
-                values = session.query(Item).options(joinedload(Item.category)).all()
-                print(values[0].category)
-
-        else:
-            print("Unknown action requested, cannot proceed")
-            sys.exit(1)
+        with Session(bind=engine) as session:
+            values = session. \
+                query(Item). \
+                options(joinedload(Item.category)).all()
+            print(values)
+                
+    else:
+        print("Unknown action requested, cannot proceed")
+        sys.exit(1)

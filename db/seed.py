@@ -1,4 +1,4 @@
-from models import Item, Category, Note, Resource
+from db.models import Item, Category, Note, Resource
 
 def seeds():
 
@@ -200,6 +200,21 @@ def seeds():
     item64.category = category5
     item65.category = category5
     item66.category = category5
+
+    item1.ml_id = 'paper'
+    item3.ml_id = 'newspaper'
+    item13.ml_id = 'cardboard'
+    item21.ml_id = 'paper_towel'
+    item23.ml_id = 'chopsticks_food'
+    item26.ml_id = 'paper_bowl_food'
+    item27.ml_id = 'plastic_bottle'
+    item30.ml_id = 'plastic_bag'
+    item35.ml_id = 'plastic_utensils_food'
+    item38.ml_id = 'plastic_packaging_food'
+    item39.ml_id = 'glass'
+    item49.ml_id = 'aluminium_can'
+    item59.ml_id = 'e-waste'
+    item60.ml_id = 'battery'
 
     items = [item1, item2, item3, item4, item5, item6, item7, item8, item9, item10, 
              item11, item12, item13, item14, item15, item16, item17, item18, item19, item20, 
